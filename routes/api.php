@@ -20,3 +20,4 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::post('submit',[RegistrationController::class,'formData']);
+Route::post('check',[RegistrationController::class,'checkAuth']);

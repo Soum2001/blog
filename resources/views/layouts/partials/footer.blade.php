@@ -9,5 +9,15 @@
 
 <script src="assets/js/register.js"></script>
 
+
+<!-- forget_password -->
+<script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+<!-- forget_password -->
+<!-- otp_front -->
+<script src="assets/js/getotp.js"></script>
+<!-- otp_front -->
+
+
+
 </body>
 </html>

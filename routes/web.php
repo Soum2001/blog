@@ -19,4 +19,6 @@ Route::get('/', function () {
 });
 
 Route::get('register',[RegistrationController::class,'loadRegistrationPage']);
-
+Route::get('forget_password',[RegistrationController::class,'loadForgetPasswordPage']);
+Route::post('request_password',[RegistrationController::class,'request_password']);
+Route::post('verify_otp',[RegistrationController::class,'verify_otp']);
