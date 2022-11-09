@@ -15,9 +15,9 @@ class RegistrationController extends Controller
 {
     //
     function loadRegistrationPage(){
-        $user_details= UserDetailsModel::all();
-        return $user_details;
-        //return view('register');
+        // $user_details= UserDetailsModel::all();
+        // return $user_details;
+        return view('register');
     }
     function loadForgetPasswordPage(){
         // $user_details= UserDetailsModel::all();
@@ -35,7 +35,7 @@ class RegistrationController extends Controller
         $user_details->email      = $request->email;
         $user_details->address    = $request->addres;
         $user_details->phone_no   = $request->phnno;
-        $user_details->user_type  = 1;
+        $user_details->user_type  = 2;
         $user_details->active     = 1;
         // $user_details->created_at = now();
         // $user_details->updated_at = now();
@@ -43,17 +43,17 @@ class RegistrationController extends Controller
     }
     public function checkAuth(Request $request)
     {
-        
+       
         $user=UserDetailsModel::where('email',$request->mail_id)->first();
         if(!$user || !Hash::check($request->passsword,$user->password))
         {
             return 'user not found';
         }
         else{
-            return view('user_profile');
+            return view('admin_page');
         }
     }
-    public function request_password(Request $request)
+    public function requestPassword(Request $request)
     {
         $otp = rand(100000,999999);
         Log::info("otp = ".$otp);
@@ -67,15 +67,34 @@ class RegistrationController extends Controller
         ];
 
         Mail::to($request->otp_email)->send(new SendOtp($mail_details));
+
+            session()-> put('mail',$request->otp_email);
         
             return view("otp_front");
         }
         else{
             return 'Invalid';
         }
+
     }
-    public function verify_otp(Request $request)
+    public function verifyOtp(Request $request)
     {
-        echo $request;
+        $otp          = $request->otp;
+        $user_details = UserDetailsModel::where('otp', $otp)->get();;
+        if($user_details)
+        {
+            return view('reset_password');
+        }
+    }
+    public function getNewPassword(Request $req)
+    {
+        $mail= session('mail');
+        $check_mail=UserDetailsModel::where('email',$mail )->update(array('password'=>Hash::make($req->chng_password)));
+        session()->pull('mail');
+        if($check_mail)
+        {
+            return view('reset_password');
+        }
+        
     }
 }

@@ -13,7 +13,8 @@
                   <div class="panel-body">
     
                     <form role="form" autocomplete="off" class="form" action="request_password" method="post">
-                      @csrf
+                    <meta name="csrf-token" content="{{ csrf_token() }}">
+                      <input type="hidden" id="_token" name="_token" value="{{ csrf_token() }}" />
                       <div class="form-group">
                         <div class="input-group">
                           <span class="input-group-addon"><i class="glyphicon glyphicon-envelope color-blue"></i></span>

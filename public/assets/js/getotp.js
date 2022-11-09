@@ -1,9 +1,6 @@
 
-$(document).ready(function(){
- 
-});
 let digitValidate = function(ele){
-    console.log(ele.value);
+   
     ele.value = ele.value.replace(/[^0-9]/g,'');
     }
     let tabChange = function(val){
@@ -25,14 +22,18 @@ function verify_otp(){
     $("#otp_dig5").val()+$("#otp_dig6").val();
    
    $.ajax({
+    headers: {
+      'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+  },
     url:"verify_otp",
     type:"post",
     data:{otp:otp},
-    success:function(respense){
-      var res=JSON.parse(respense);
-      if (res.status=='SUCCESS'){
-        window.location="reset_password.php";
-      }
-    }
+    success:function(response){
+      var res=JSON.parse(response);
+      alert(res);
+
+    window.open('127.0.0.1:8000/reset_password');
+    },
    });
+
 }

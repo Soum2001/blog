@@ -9,8 +9,9 @@
               Verify OTP
             </div>
             
-            <form method="post">
-              @csrf
+            <form action="verify_otp" method="post">
+            <meta name="csrf-token" content="{{ csrf_token() }}">
+              <input type="hidden" id="_token" name="_token" value="{{ csrf_token() }}" />
                 <div class="row">
                     <div class="col-sm-12">
                         <input class="otp" type="text" id="otp_dig1" oninput='digitValidate(this)' onkeyup='tabChange(1)' maxlength=1 >
@@ -23,7 +24,7 @@
                 </div>
                 <div class="row">
                     <div class="col-sm-12">
-                        <input type="button" value="verify"  class='btn btn-primary btn-block mt-4 mb-4 customBtn' onclick="verify_otp()">
+                        <button type="submit" value="verify"  class='btn btn-primary btn-block mt-4 mb-4 customBtn' onclick="verify_otp()">verify</button>
                     </div>
                 </div>
             </form>

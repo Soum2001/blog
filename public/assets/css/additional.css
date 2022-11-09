@@ -4,7 +4,11 @@
 body{
 background:#eee;
 }
-
+.panel-default{
+    border: 1px solid #ced4da;
+    border-radius: 5px;
+    padding:10px; 
+}
     .bgWhite{
     background:white;
     box-shadow:0px 3px 6px 0px #cacaca;

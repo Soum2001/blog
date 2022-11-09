@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdminController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RegistrationController;
 
@@ -17,8 +18,19 @@ use App\Http\Controllers\RegistrationController;
 Route::get('/', function () {
     return view('welcome');
 });
+// RegistrationController
 
 Route::get('register',[RegistrationController::class,'loadRegistrationPage']);
+
+Route::post('user_page',[RegistrationController::class,'checkAuth']);
+
 Route::get('forget_password',[RegistrationController::class,'loadForgetPasswordPage']);
-Route::post('request_password',[RegistrationController::class,'request_password']);
-Route::post('verify_otp',[RegistrationController::class,'verify_otp']);
+Route::post('request_password',[RegistrationController::class,'requestPassword']);
+
+Route::post('verify_otp',[RegistrationController::class,'verifyOtp']);
+Route::post('change_password',[RegistrationController::class,'changePassword']);
+
+Route::post('abc',[RegistrationController::class,'getNewPassword']);
+
+//AdminController
+Route::get('user_details',[AdminController::class,'loadUserDetails']);

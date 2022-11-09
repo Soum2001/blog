@@ -107,7 +107,7 @@
               <div class="card-body box-profile">
                 <div class="text-center">
                   <form  action="user_profile_upload.php" method="POST" enctype="multipart/form-data">
-                    <input type="hidden" id="user_id" value=<?=$id?>>
+                    <input type="hidden" id="user_id" >
                     <img class="profile-user-img  img-circle" src="<?= $src;?>"  id="profile_image">
                     <input type="file" id="profile_imgupload" name="profile_imgupload" onchange="crop_class.loadprofile_img(this,1)" style="display:none"/> 
                     <i class="fas fa-camera upload-profile" id="profileupload" ></i>
@@ -160,31 +160,16 @@
               <div class="card-header p-2">
                 <ul class="nav nav-pills" id="navbar">
                     <!-- <li class="nav-item">
-                    <a class="nav-link active" id="profile_images" onclick="profile_page(<?=$id?>)" data-toggle="tab">profile image</a>
+                    <a class="nav-link active" id="profile_images" onclick="profile_page(" data-toggle="tab">profile image</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#banner" id="banner_images" onclick="banner_page(<?=$id?>)" data-toggle="tab">Banner image</a>
+                        <a class="nav-link" href="#banner" id="banner_images" onclick="banner_page()" data-toggle="tab">Banner image</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#Details" id="Details"data-toggle="tab">Details</a>
                     </li> -->
                   
-                      <?foreach ($select_nav_name as $name){?>
-                      <li class="nav-item">
-                          <a class="nav-link" onclick="load_gallery(<?=$name['id']?>)" data-toggle="tab"><? echo $name['gallery_name']?></a>
-                      </li>
-                      <?}?>
-                     
-                      <li class="nav-item">
-                      <a class="nav-link"><button class="btn btn-primary float-sm-right" onclick="add_gallery(<?=$id?>)">Add Gallery</button></a>
-                      </li> 
-                      <?if($user_role=='admin')
-                      {
-                      ?>
-                      <li class="nav-item dropdown">
-                      <?include 'users_dropdown.php'?>
-                      </li>
-                      <?}?>
+                      
                      
                 </ul>
               </div>

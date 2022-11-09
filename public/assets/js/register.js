@@ -1,4 +1,5 @@
 $(document).ready(function(){
+   
     $('#user_table').DataTable({
         "lengthMenu": [
             [10, 15, 45, 75, -1],
@@ -6,9 +7,9 @@ $(document).ready(function(){
         ],
         "pageLength": 10,
         "bProcessing":true,
-        "bServerSide": true,
+        "bServerSide": false,
         "bStateSave": false,
-        "bPaginate": true,
+        "bPaginate": false,
         "bLengthChange": true,
         "bFilter": true,
         "bSort": false,
@@ -16,14 +17,15 @@ $(document).ready(function(){
         "bAutoWidth": false,
         "bDestroy": false, 
         "ajax": {
-            "url": "user_details.php",
-            "type":"POST",
+            
+            "url": "user_details",
+            "type":"get",
              dataSrc:'aaData'
         },
         "sDom":"<'row'<'col-xs-4 col-sm-3 'l><'col-lg-1 col-md-12 col-sm-12'><'col-md-4 col-sm-4'>f>t<'row'<'col-lg-6 col-md-12 col-sm-12' <'row' <'col-lg-6 col-md-12 col-sm-12' i>>><'col-lg-6 col-md-12 col-sm-12'p>>",
         "aoColumns": [
             { "data": 'id', "name": "id", "className": "text-center", "sWidth": "10%" },
-            { "data": "user_name", "name": "user_name", "sWidth": "20%" },
+            { "data": "username", "name": "user_name", "sWidth": "20%" },
             { "data": "email", "name": "email", "sWidth": "20%" },
             { "data": "address", "name": "address", "sWidth": "20%" },
             { "data": "phone_no", "name": "phone_no", "sWidth": "20%" },

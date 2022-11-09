@@ -1,9 +1,10 @@
 
 
 <!-- CSS only-->
-   
+
 @include('layouts.partials.head')
-<body class="hold-transition login-page">
+
+<body class="login-page">
 <div class="login-box">
   <!-- /.login-logo -->
   <div class="card card-outline card-primary">
@@ -13,7 +14,9 @@
     <div class="card-body">
       <p class="login-box-msg">Sign in to start your session</p>
 
-      <form action="api/check" method="post">
+      <form action="user_page" method="post">
+      <meta name="csrf-token" content="{{ csrf_token() }}">
+        <input type="hidden" id="_token" name="_token" value="{{ csrf_token() }}" />
         <div class="input-group mb-3">
           <input type="email" class="form-control" id="mail_id" name="mail_id" placeholder="Email">
           <div class="input-group-append">
