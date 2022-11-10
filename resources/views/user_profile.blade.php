@@ -8,14 +8,14 @@
     <ul class="navbar-nav">
       <form method="POST" action="logout.php">
         <div class="row">
-            <div class="col-md-6">
+            <div class="col-md-4">
               <li class="nav-item">
                 <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
               </li> 
             </div>
-            <div class="col-md-6">
+            <div class="col-md-8">
               <li class="nav-item">
-                <input type="submit" class="btn btn-primary" onclick="logout_btn()" id="logout_btn" name="logout_btn" value="Log out">
+                <button type="submit" class="btn btn-primary" onclick="logout_btn()" id="logout_btn" name="logout_btn" >Log Out</button>
               </li> 
             </div>
         </div>
@@ -37,7 +37,7 @@
       <!-- Sidebar user (optional) -->
       <div class="user-panel mt-3 pb-3 mb-3 d-flex">
       <div class="image">
-          <img src=""  class="img-circle elevation-2">
+          <img src="assets/image/default-avatar.png"  class="img-circle elevation-2">
       </div>
         <div class="info">
           <a href="#" class="d-block">Soumya</a>
@@ -79,7 +79,7 @@
               </li>
               <?}?>
               <li class="nav-item">
-                <a href="user_profile.php" class="nav-link">
+                <a href="user_profile" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Profile</p>
                 </a>
@@ -108,7 +108,7 @@
                 <div class="text-center">
                   <form  action="user_profile_upload.php" method="POST" enctype="multipart/form-data">
                     <input type="hidden" id="user_id" >
-                    <img class="profile-user-img  img-circle" src="<?= $src;?>"  id="profile_image">
+                    <img class="profile-user-img  img-circle" src="assets/image/default-avatar.png"  id="profile_image">
                     <input type="file" id="profile_imgupload" name="profile_imgupload" onchange="crop_class.loadprofile_img(this,1)" style="display:none"/> 
                     <i class="fas fa-camera upload-profile" id="profileupload" ></i>
                   </form>

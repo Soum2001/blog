@@ -1,16 +1,15 @@
 $(document).ready(function(){
-   
-    $('#user_table').DataTable({
+    let dtblUser=$('#dtblUser').DataTable({
         "lengthMenu": [
             [10, 15, 45, 75, -1],
             [10, 15, 45, 75,  'all']
         ],
         "pageLength": 10,
         "bProcessing":true,
-        "bServerSide": false,
+        "bServerSide": true,
         "bStateSave": false,
-        "bPaginate": false,
-        "bLengthChange": true,
+        "bPaginate": true,
+        "bLengthChange": false,
         "bFilter": true,
         "bSort": false,
         "bInfo": true,
@@ -33,30 +32,108 @@ $(document).ready(function(){
                 "sName": "action",
                 "data": null,
                 "className": "text-center",
-                "defaultContent": "<button id='edit_user' action ='edit_user' onclick='edit_user()' class='btn btn-info btn-sm'><i class='fa fa-edit' ></i></button>&nbsp;&nbsp<button id='delete_user' action ='delete_user' class='btn btn-danger btn-sm'><i class='fa fa-trash'></i></button>"
+                "defaultContent": "<button id='edit_user' action ='edit_user'  class='btn btn-info btn-sm'><i class='fa fa-edit' ></i></button>&nbsp;&nbsp<button id='delete_user' action ='delete_user' class='btn btn-danger btn-sm'><i class='fa fa-trash'></i></button>"
             }
            
         ],
 
     });
-//     $("#register").click(function(){
-//         alert('hi');
-//         var form = $('#form');
-//         console.log(form.serialize());
-//         // $.ajax({
-//         //     url: "insert",
-//         //     type:'POST', 
-//         //     data:form.serialize(),
-//         //     success:function(response){
-//         //         console.log(response);
-//         //         var jsonData = JSON.parse(response);
-//         //         console.log(jsonData);
-//         //         if(jsonData.success){
-//         //             alert(jsonData.msg);
-//         //         }else{
-//         //             alert(jsonData.msg);
-//         //         }
-//         //     }
-//         // });
-//     })
+
+
+
+    $('#dtblUser tbody').on('click', 'button[action=edit_user]', function(event) {
+        var data = dtblUser.row($(this).parents('tr')).data();
+        var oTable = $('#dtblUser').dataTable();
+        // console.log(oTable);
+        // $(oTable.fnSettings().aaData).each(function() {
+        //     $(this.nTr).removeClass('success');
+            
+        // });
+       
+    var row;
+    if (event.target.tagName == "BUTTON")
+        row = event.target.parentNode.parentNode;
+    else if (event.target.tagName == "I")
+        row = event.target.parentNode.parentNode.parentNode;
+        $(row).addClass('success');
+    
+        //$("#modal_user").html('Edit Group');
+        //$("#edit_user").html('<i class="fa fa-edit"></i> Update');
+        $("#edit_user").removeAttr('disabled');
+
+         var user_name = oTable.fnGetData(row).username;
+         var email     = oTable.fnGetData(row).email;
+         var address   = oTable.fnGetData(row).address;
+         var phn_no    = oTable.fnGetData(row).phone_no;
+        console.log(oTable.fnGetData(row).username);
+            $('#user_id').val(oTable.fnGetData(row).id);
+           
+            $('#user_name').val(user_name);
+            $('#mail_id').val(email);
+            $('#addres').val(address);
+            $('#mob').val(phn_no);
+         $('#exampleModalCenter').modal('show');
+    });
+
+
+
+    $('#dtblUser tbody').on('click', 'button[action=delete_user]', function(event) {
+        var data = dtblUser.row($(this).parents('tr')).data();
+        var oTable = $('#dtblUser').dataTable();
+      
+        var row;
+        
+        if (event.target.tagName == "BUTTON")
+            row = event.target.parentNode.parentNode;
+        else if (event.target.tagName == "I")
+            row = event.target.parentNode.parentNode.parentNode;
+        $(row).addClass('success');
+        swal({
+            title: 'Are you sure to Delete?',
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes',
+            animation: true
+        }).then(function() {
+            $.ajax({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]')
+                },
+                url:"delete_user",
+                type: "get",
+                data: {id: data.id },
+                success: function(response) {
+                    if (response.dbStatus == 'SUCCESS') {
+                        dtblUser.ajax.reload();
+                        // Loadcriteriatbl();
+                        toastr.success(response.dbMessage);
+                    } else if (response.dbStatus == 'FAILURE') {
+                        toastr.error(response.dbMessage);
+                    }
+                },
+                error: function() {
+                    toastr.error('Unable to process Delete Operation');
+                }
+            });
+        }, function(dismiss) {}).done();
+    });		
  })
+ function edit()
+ {
+    var id=$('#user_id').val();
+    
+    $.ajax({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        url:"edit_user",
+        type:"post",
+        data:{id:id},
+        success:function(response){
+          var res=JSON.parse(response);
+          
+        },
+       });
+ }

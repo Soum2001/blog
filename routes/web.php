@@ -34,3 +34,7 @@ Route::post('abc',[RegistrationController::class,'getNewPassword']);
 
 //AdminController
 Route::get('user_details',[AdminController::class,'loadUserDetails']);
+Route::post('edit_user',[AdminController::class,'editUserDetails']);
+Route::get('/delete_user',[AdminController::class,'deleteUserDetails']);
+Route::get('/admin_page',[AdminController::class,'loadAdminDashboard']);
+Route::post('/user_profile/',[AdminController::class,'loadUserProfilePage']);

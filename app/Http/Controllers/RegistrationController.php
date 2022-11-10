@@ -50,7 +50,14 @@ class RegistrationController extends Controller
             return 'user not found';
         }
         else{
-            return view('admin_page');
+            if($user->user_type==1)
+            {
+                return view('admin_page');
+            }
+            else{
+                return view('user_profile');
+            }
+            
         }
     }
     public function requestPassword(Request $request)
