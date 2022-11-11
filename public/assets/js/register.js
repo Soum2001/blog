@@ -76,7 +76,30 @@ $(document).ready(function(){
     });
 
 
-
+    // $('#register').click(function(){
+    //     var formData = new FormData($("#form").val()); 
+    //     console.log(formData);
+    //     $.ajax({
+    //         headers: {
+    //             'X-CSRF-TOKEN': $('meta[name="csrf-token"]')
+    //         },
+    //         url:"api/submit",
+            
+    //         data: formData,
+    //         success: function(response) {
+    //             if (response.dbStatus == 'SUCCESS') {
+    //                 //dtblUser.ajax.reload();
+    //                 // Loadcriteriatbl();
+    //                 toastr.success(response.dbMessage);
+    //             } else if (response.dbStatus == 'FAILURE') {
+    //                 toastr.error(response.dbMessage);
+    //             }
+    //         },
+    //         error: function() {
+    //             toastr.error('Unable to process Delete Operation');
+    //         }
+    //     });
+    // });
     $('#dtblUser tbody').on('click', 'button[action=delete_user]', function(event) {
         var data = dtblUser.row($(this).parents('tr')).data();
         var oTable = $('#dtblUser').dataTable();
@@ -118,7 +141,10 @@ $(document).ready(function(){
                 }
             });
         }, function(dismiss) {}).done();
-    });		
+    });	
+
+   
+
  })
  function edit()
  {
@@ -137,3 +163,42 @@ $(document).ready(function(){
         },
        });
  }
+ function status_change(state)
+{
+    alert(state);
+    var id = $('#user_id').val();
+    $.ajax({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        url: "status_change",
+        type:'POST', 
+        data:{id:id,'state':state}, 
+        success:function(response){
+            //console.log(response)
+            var jsonData = JSON.parse(response);
+            console.log(jsonData);
+            if(jsonData.dbStatus=='SUCCESS'){
+                if(state==0)
+                {
+                    document.getElementById("inactive").disabled = true;
+                    document.getElementById("active").disabled = false;
+                }
+                else{
+                    document.getElementById("inactive").disabled = false;
+                    document.getElementById("active").disabled = true;
+                }
+                
+                $("#exampleModalCenter").modal("hide");
+                toastr.success(jsonData.dbMessage);
+                //alert(jsonData.dbMessage);
+            }else{
+                toastr.error(jsonData.dbMessage);
+               
+                $("#exampleModalCenter").modal("hide");
+            }
+            
+        }
+        });
+
+}

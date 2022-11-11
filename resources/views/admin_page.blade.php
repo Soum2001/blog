@@ -57,14 +57,14 @@
             <ul class="nav nav-treeview">
               <li class="nav-item">
                 <a href="admin_page" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
+                  <i class="fas fa-users nav-icon"></i>
                   <p>Manage User</p>
                 </a>
               </li>
 
               <li class="nav-item">
                 <a href="user_profile" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
+                  <i class="fas fa-user nav-icon"></i>
                   <p>Profile</p>
                 </a>
               </li>
@@ -172,9 +172,10 @@
           </div>
           <div class="modal-footer">
             <input type="submit" class="btn btn-primary" id="edit_user" onclick="edit()" value="Edit">
+            
+            <button type="button" class="btn btn-secondary" id="inactive" onclick="status_change(0)">Inactive</button>
+            <button type="button" class="btn btn-primary" id="active" onclick="status_change(1)">Active</button>
             </form>
-            <button type="button" class="btn btn-secondary" id="inactive" onclick="status_inactive()">Inactive</button>
-            <button type="button" class="btn btn-primary" id="active" onclick="status_active()">Active</button>
           </div>
 
         </div>

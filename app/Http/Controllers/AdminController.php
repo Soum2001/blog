@@ -6,19 +6,31 @@ use Illuminate\Http\Request;
 
 class AdminController extends Controller
 {
-    public function loadUserProfilePage(Request $req)
+    public function loadUserProfilePage()
     {
-        $select_user=UserDetailsModel::where('user_type',1)->get();
-        foreach($select_user as $row)
-        {
-            $user_name=$row->username;
-            
-        }
-        return view('user_profile');
+        $select_user = UserDetailsModel::where('user_type',1)->get();
+        return view('user_profile')->with(array('user_details'=>$select_user));
     }
     public function loadAdminDashboard(Request $req)
     {
         return view('admin_page');
+    }
+
+    public function userstatus_inactive(Request $req)
+    {
+        $output = array('dbStatus'=>'','dbMessage'=>'');
+        $update_status=UserDetailsModel::where('id',$req->id )
+          ->update(array('active'=>$req->state));
+          if($update_status)
+          {
+              $output['dbStatus']  = 'SUCCESS';
+              $output['dbMessage'] = 'Status Changed.';
+          }
+          else{
+              $output['dbStatus']  = 'FAILURE';
+              $output['dbMessage'] = 'OOPS! Someting Went Wrong in delete Operation.';
+          }
+          echo json_encode($output);
     }
     function loadUserDetails(Request $request){
        

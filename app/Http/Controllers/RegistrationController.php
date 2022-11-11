@@ -25,7 +25,8 @@ class RegistrationController extends Controller
         return view('forget_password');
     }
     function formData(Request $request){
-        // print_r($request->input());
+        //print_r($request->input());
+        //$output = array('dbStatus'=>'','dbMessage'=>'');
         $user_details             = new UserDetailsModel;
         $user_details->username   = $request->user_name;
         $hashedPassword           = Hash::make( $request->password);
@@ -40,6 +41,16 @@ class RegistrationController extends Controller
         // $user_details->created_at = now();
         // $user_details->updated_at = now();
         $user_details->save();
+        // if($register)
+        //  {
+        //      $output['dbStatus']  = 'SUCCESS';
+        //      $output['dbMessage'] = 'User Registered.';
+        //  }
+        //  else{
+        //      $output['dbStatus']  = 'FAILURE';
+        //      $output['dbMessage'] = 'OOPS! Someting Went Wrong in delete Operation.';
+        //  }
+        //  return response()->json($output); 
     }
     public function checkAuth(Request $request)
     {
@@ -47,7 +58,7 @@ class RegistrationController extends Controller
         $user=UserDetailsModel::where('email',$request->mail_id)->first();
         if(!$user || !Hash::check($request->passsword,$user->password))
         {
-            return 'user not found';
+            return view('user_not_found');
         }
         else{
             if($user->user_type==1)

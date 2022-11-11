@@ -1,8 +1,10 @@
 <?php
 
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\ImageUploadController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RegistrationController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -22,6 +24,7 @@ Route::get('/', function () {
 
 Route::get('register',[RegistrationController::class,'loadRegistrationPage']);
 
+
 Route::post('user_page',[RegistrationController::class,'checkAuth']);
 
 Route::get('forget_password',[RegistrationController::class,'loadForgetPasswordPage']);
@@ -35,6 +38,10 @@ Route::post('abc',[RegistrationController::class,'getNewPassword']);
 //AdminController
 Route::get('user_details',[AdminController::class,'loadUserDetails']);
 Route::post('edit_user',[AdminController::class,'editUserDetails']);
+
 Route::get('/delete_user',[AdminController::class,'deleteUserDetails']);
 Route::get('/admin_page',[AdminController::class,'loadAdminDashboard']);
-Route::post('/user_profile/',[AdminController::class,'loadUserProfilePage']);
+Route::get('/user_profile',[AdminController::class,'loadUserProfilePage']);
+Route::post('/status_change',[AdminController::class,'userstatus_inactive']);
+
+Route::post('/user_profile_upload', [ImageUploadController::class, 'imageUpload']);
