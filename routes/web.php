@@ -44,4 +44,5 @@ Route::get('/admin_page',[AdminController::class,'loadAdminDashboard']);
 Route::get('/user_profile',[AdminController::class,'loadUserProfilePage']);
 Route::post('/status_change',[AdminController::class,'userstatus_inactive']);
 
-Route::post('/user_profile_upload', [ImageUploadController::class, 'imageUpload']);
+Route::post('/image_upload', [ImageUploadController::class, 'imageUpload']);
+Route::post('/banner_upload', [ImageUploadController::class, 'imageUpload']);

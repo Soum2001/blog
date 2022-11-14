@@ -14,13 +14,14 @@ class CreateUserDetailsTable extends Migration
     public function up()
     {
         Schema::create('user_details', function (Blueprint $table) {
-            $table->id();
+            $table->bigInteger('id')->autoIncrement();
             $table->String('username');
             $table->String('email');
             $table->String('address');
             $table->String('phone_no');
             $table->String('password');
-            $table->String('user_type');
+            $table->bigInteger('user_type');
+            $table->foreign('user_type')->references('id')->on('user_types')->onDelete('cascade');
             $table->String('active');
             $table->timestamps();
         });

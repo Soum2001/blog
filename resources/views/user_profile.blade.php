@@ -62,35 +62,35 @@
           <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
             <!-- Add icons to the links using the .nav-icon class
                with font-awesome or any other icon font library -->
-            <li class="nav-item">
+            <!-- <li class="nav-item">
               <a href="#" class="nav-link">
                 <i class="nav-icon fas fa-tachometer-alt"></i>
                 <p>
                   User Details
                   <i class="right fas fa-angle-left"></i>
                 </p>
-              </a>
-              <ul class="nav nav-treeview">
-                <!-- @foreach($user_details as $user_data)
+              </a> -->
+            <!-- <ul class="nav nav-treeview"> -->
+            <!-- @foreach($user_details as $user_data)
             {
               @if($user_data->user_type==1){ -->
-                <li class="nav-item">
-                  <a href="admin_page" class="nav-link">
-                    <i class="fas fa-users nav-icon"></i>
-                    <p>Manage User</p>
-                  </a>
-                </li>
-                <!-- }@endif
+            <li class="nav-item">
+              <a href="admin_page" class="nav-link">
+                <i class="fas fa-users nav-icon"></i>
+                <p>Manage User</p>
+              </a>
+            </li>
+            <!-- }@endif
             }
             @endforeach -->
-                <li class="nav-item">
-                  <a href="user_profile" class="nav-link">
-                    <i class="fas fa-user nav-icon"></i>
-                    <p>Profile</p>
-                  </a>
-                </li>
-              </ul>
+            <li class="nav-item">
+              <a href="user_profile" class="nav-link">
+                <i class="fas fa-user nav-icon"></i>
+                <p>Profile</p>
+              </a>
             </li>
+            <!-- </ul>
+            </li> -->
           </ul>
         </nav>
         <!-- /.sidebar-menu -->
@@ -111,22 +111,30 @@
               <div class="card card-primary card-outline">
                 <div class="card-body box-profile">
                   <div class="text-center">
-                    
-                    <form method="POST" enctype="multipart/form-data" >
-                      
+
+                    <form method="POST" enctype="multipart/form-data" id="crop-form">
+
                       <meta name="csrf-token" content="{{ csrf_token() }}">
                       <input type="hidden" id="_token" name="_token" value="{{ csrf_token() }}" />
-                       
+
                       <input type="hidden" id="user_id">
-                      <img class="profile-user-img  img-circle" src="assets/image/default-avatar.png" id="profile_image">
+                      <img class="profile-user-img  img-circle" src="assets/image/default-avatar.png" id="profile_image" name="profile_image">
                       <input type="file" id="profile_imgupload" name="profile_imgupload" onchange="crop_class.loadprofile_img(this,1)" style="display:none" />
                       <i class="fas fa-camera upload-profile" id="profileupload"></i>
-
+                      @include('layouts.partials.modal')
+                    </form>
                   </div>
-                  <h3 class="profile-username text-center"><b><span id="head_username" name="head_username"></span> </b></h3>
-                  <p class="text-muted text-center">student</p>
-                  <input type="file" id="banner_imgupload" name="banner_imgupload" onchange="crop_class.loadbanner_img(this,2)" style="display:none" />
-                  <button class="btn btn-primary" id="banner_btn">banner upload</button>
+                  <form method="POST" enctype="multipart/form-data" id="banner-form">
+
+                    <meta name="csrf-token" content="{{ csrf_token() }}">
+                    <input type="hidden" id="_token" name="_token" value="{{ csrf_token() }}" />
+                    <h3 class="profile-username text-center"><b><span id="head_username" name="head_username"></span> </b></h3>
+                    <p class="text-muted text-center">student</p>
+                    <input type="file" id="banner_imgupload" name="banner_imgupload" onchange="crop_class.loadbanner_img(this,2)" style="display:none" />
+                    <i class="btn btn-primary" id="banner_btn">banner upload</i>
+                    @include('layouts.partials.modal')
+
+                  </form>
                   <!--banner upload-->
 
 
@@ -204,37 +212,7 @@
         </div><!-- /.container-fluid -->
       </section>
       <!-- /.content -->
-      <div class="modal fade" id="crop_image" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-xl" role="document">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
-            <div class="modal-body">
-              <div class="container">
-                <div class="row">
-
-                  <div class="col-md-8">
-                    <img src="" id="crop_img" name="crop_img">
-                  </div>
-
-                  <div class="col-md-4">
-                    <div class="preview" id="preview" style="width:250px;height:250px;overflow:hidden"></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-              <button type="submit" class="btn btn-primary" id="crop">Crop</button>
-            </div>
-            </form>
-          </div>
-        </div>
-      </div>
+      
     </div>
     <!-- /.content-wrapper -->
     <footer class="main-footer">

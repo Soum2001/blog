@@ -56,6 +56,9 @@ class RegistrationController extends Controller
     {
        
         $user=UserDetailsModel::where('email',$request->mail_id)->first();
+
+        session()-> put('login_id',$user->id);
+
         if(!$user || !Hash::check($request->passsword,$user->password))
         {
             return view('user_not_found');
