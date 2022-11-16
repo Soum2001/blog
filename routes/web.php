@@ -46,3 +46,8 @@ Route::post('/status_change',[AdminController::class,'userstatus_inactive']);
 
 Route::post('/image_upload', [ImageUploadController::class, 'imageUpload']);
 Route::post('/banner_upload', [ImageUploadController::class, 'imageUpload']);
+
+Route::get('/upload_gallery', [ImageUploadController::class, 'fetchGalleries']);
+
+Route::get('/load_images', [ImageUploadController::class, 'loadImages']);
+Route::post('/add_new_gallery', [ImageUploadController::class, 'loadNewGallery']);

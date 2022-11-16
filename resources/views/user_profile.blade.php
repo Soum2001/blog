@@ -4,35 +4,26 @@
   <div class="wrapper">
     <!-- Navbar -->
     <nav class="main-header navbar navbar-expand navbar-white navbar-light">
-      <!-- Left navbar links -->
 
       <ul class="navbar-nav">
-        <form method="POST" action="logout.php">
-          <div class="row">
-            <div class="col-md-4">
-              <li class="nav-item">
-                <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
-              </li>
-            </div>
-            <div class="col-md-8">
-              <li class="nav-item">
-                <button type="submit" class="btn btn-primary" onclick="logout_btn()" id="logout_btn" name="logout_btn">Log Out</button>
-              </li>
-            </div>
-          </div>
-        </form>
+        <li class="nav-item">
+          <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+        </li>
+      </ul>
+
+      <ul class="navbar-nav ml-auto">
+        <li class="nav-item">
+          <a class="nav-link" data-widget="control-sidebar" data-slide="true" href="#" role="button">
+            <button type="submit" class="btn btn-primary" onclick="logout_btn()" id="logout_btn" name="logout_btn">Log Out</button>
+          </a>
+        </li>
       </ul>
     </nav>
+
     <!-- /.navbar -->
 
     <!-- Main Sidebar Container -->
     <aside class="main-sidebar sidebar-dark-primary elevation-4">
-      <!-- Brand Logo -->
-      <!-- <a href="../../index3.html" class="brand-link">
-      <img src="../../dist/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
-      <span class="brand-text font-weight-light">AdminLTE 3</span>
-    </a> -->
-
       <!-- Sidebar -->
       <div class="sidebar">
         <!-- Sidebar user (optional) -->
@@ -45,51 +36,40 @@
           </div>
         </div>
 
-        <!-- SidebarSearch Form -->
-        <div class="form-inline">
-          <div class="input-group" data-widget="sidebar-search">
-            <input class="form-control form-control-sidebar" type="search" placeholder="Search" aria-label="Search">
-            <div class="input-group-append">
-              <button class="btn btn-sidebar">
-                <i class="fas fa-search fa-fw"></i>
-              </button>
-            </div>
-          </div>
-        </div>
+
 
         <!-- Sidebar Menu -->
         <nav class="mt-2">
           <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-            <!-- Add icons to the links using the .nav-icon class
-               with font-awesome or any other icon font library -->
-            <!-- <li class="nav-item">
-              <a href="#" class="nav-link">
+            <li class="nav-item">
+              <a href="" class="nav-link">
                 <i class="nav-icon fas fa-tachometer-alt"></i>
-                <p>
-                  User Details
-                  <i class="right fas fa-angle-left"></i>
-                </p>
-              </a> -->
-            <!-- <ul class="nav nav-treeview"> -->
-            <!-- @foreach($user_details as $user_data)
-            {
-              @if($user_data->user_type==1){ -->
+                <p>Dashboard</p>
+              </a>
+            </li>
             <li class="nav-item">
               <a href="admin_page" class="nav-link">
                 <i class="fas fa-users nav-icon"></i>
                 <p>Manage User</p>
               </a>
             </li>
-            <!-- }@endif
-            }
-            @endforeach -->
+
             <li class="nav-item">
               <a href="user_profile" class="nav-link">
                 <i class="fas fa-user nav-icon"></i>
                 <p>Profile</p>
               </a>
             </li>
-            <!-- </ul>
+            <li class="nav-item">
+              <a href="upload_gallery" class="nav-link">
+                <i class="nav-icon far fa-image"></i>
+                <p>Gallery</p>
+              </a>
+            </li>
+
+          </ul>
+          </li>
+          <!-- </ul>
             </li> -->
           </ul>
         </nav>
@@ -101,11 +81,21 @@
     <!-- Content Wrapper. Contains page content -->
     <div class="content-wrapper">
       <!-- Content Header (Page header) -->
+      <section class="content-header">
+        <div class="container-fluid">
+          <div class="row mb-2">
+            <div class="col-sm-6">
+              <h1>Profile</h1>
+            </div>
+
+          </div>
+        </div>
+      </section>
       <!-- Main content -->
       <section class="content">
         <div class="container-fluid">
           <div class="row">
-            <div class="col-md-3">
+            <div class="col-md-12">
 
               <!-- Profile Image -->
               <div class="card card-primary card-outline">
@@ -118,7 +108,10 @@
                       <input type="hidden" id="_token" name="_token" value="{{ csrf_token() }}" />
 
                       <input type="hidden" id="user_id">
-                      <img class="profile-user-img  img-circle" src="assets/image/default-avatar.png" id="profile_image" name="profile_image">
+                      @foreach($select_profile as $profile_pic)
+                      <?php $img = 'storage/' . $profile_pic->img_path; ?>
+                      <img class="profile-user-img  img-circle" src="{{asset($img)}}" id="profile_image" name="profile_image">
+                      @endforeach
                       <input type="file" id="profile_imgupload" name="profile_imgupload" onchange="crop_class.loadprofile_img(this,1)" style="display:none" />
                       <i class="fas fa-camera upload-profile" id="profileupload"></i>
                       @include('layouts.partials.modal')
@@ -144,6 +137,7 @@
               <!-- /.card -->
 
               <!-- About Me Box -->
+              @if($load=='user_details')
               <div class="card card-primary">
                 <div class="card-header">
                   <h3 class="card-title">About Me</h3>
@@ -164,69 +158,95 @@
                   @endforeach
                 </div>
               </div>
+              @endif
               <!-- /.card -->
             </div>
-            <!-- /.col -->
-            <div class="col-md-9">
-              <div class="card" id="card">
-                <!-- <div class="card-header p-2">
-                <ul class="nav nav-pills">
-                  <li class="nav-item"><a class="nav-link active" href="#activity" data-toggle="tab">Activity</a></li>
-                  <li class="nav-item"><a class="nav-link" href="#timeline" data-toggle="tab">Timeline</a></li>
-                  <li class="nav-item"><a class="nav-link" href="#settings" data-toggle="tab">Settings</a></li>
-                </ul>
-              </div> -->
+            @if($load=='gallery')
+            <div class="card-body">
 
-                <div class="card-header p-2">
-                  <ul class="nav nav-pills" id="navbar">
-                    <!-- <li class="nav-item">
-                    <a class="nav-link active" id="profile_images" onclick="profile_page(" data-toggle="tab">profile image</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#banner" id="banner_images" onclick="banner_page()" data-toggle="tab">Banner image</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#Details" id="Details"data-toggle="tab">Details</a>
-                    </li> -->
+              <div class="card card-primary">
+                <div class="card-header">
+                  <div class="form-group">
+                    <h3 class="card-title">
 
+                      <label>Select Gallery</label>
+                      <select class="form-control select_gallery">
+                        <option>--select--</option>
+                        @foreach($gallery_type as $user_gallery)
+                        <option id="{{$user_gallery->id}}" value="{{$user_gallery->id}}">{{$user_gallery->gallery_name}}</option>
+                        @endforeach
+                      </select>
 
-
-                  </ul>
+                    </h3>
+                  </div>
+                  <div class="project-actions text-right">
+                    <button class="btn btn-primary btn-lg" id="add_gallery">
+                      Add Gallery
+                    </button>
+                  </div>
                 </div>
-                <!-- /.card-header -->
+
                 <div class="card-body" id="image_body">
 
-
-                  <!-- /.tab-content -->
                 </div>
-                <!-- /.card-body -->
 
               </div>
-              <!-- /.card -->
+              <!-- /.tab-content -->
             </div>
-            <!-- /.col -->
+            @endif
+            <!-- /.card-body -->
+
           </div>
-          <!-- /.row -->
+          <!-- /.card -->
+          <!--</div> -->
+          <!-- /.col -->
+        </div>
+        <!-- /.row -->
 
 
-        </div><!-- /.container-fluid -->
-      </section>
-      <!-- /.content -->
-      
-    </div>
-    <!-- /.content-wrapper -->
-    <footer class="main-footer">
-      <div class="float-right d-none d-sm-block">
-        <b>Version</b> 3.2.0
+    </div><!-- /.container-fluid -->
+    </section>
+    <!-- /.content -->
+    <div class="modal fade" id="add_gallery_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+
+          <input type="hidden" id="new_galley_id">
+          <div class="modal-body">
+            <meta name="csrf-token" content="{{ csrf_token() }}">
+            <input type="hidden" id="_token" name="_token" value="{{ csrf_token() }}" />
+            <label>gallery name</label>
+            <input type="text" id="gallery_name" name="gallery_name" class="form-control sm">
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" id="new_gallery" onclick="new_gallery()">Add Gallery</button>
+          </div>
+
+        </div>
       </div>
-      <strong>Copyright &copy; 2014-2021 <a href="https://adminlte.io">AdminLTE.io</a>.</strong> All rights reserved.
-    </footer>
+    </div>
 
-    <!-- Control Sidebar -->
-    <aside class="control-sidebar control-sidebar-dark">
-      <!-- Control sidebar content goes here -->
-    </aside>
-    <!-- /.control-sidebar -->
+  </div>
+  <!-- /.content-wrapper -->
+  <footer class="main-footer">
+    <div class="float-right d-none d-sm-block">
+      <b>Version</b> 3.2.0
+    </div>
+    <strong>Copyright &copy; 2014-2021 <a href="https://adminlte.io">AdminLTE.io</a>.</strong> All rights reserved.
+  </footer>
+
+  <!-- Control Sidebar -->
+  <aside class="control-sidebar control-sidebar-dark">
+    <!-- Control sidebar content goes here -->
+  </aside>
+  <!-- /.control-sidebar -->
   </div>
 
   <!-- ./wrapper -->

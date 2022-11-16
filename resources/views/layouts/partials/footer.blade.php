@@ -24,7 +24,8 @@
 <!-- sweet alert -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/6.6.9/sweetalert2.min.js"></script>
 
-
+<!--Toaster -->
+<script src="assets/plugins/toastr/toastr.min.js"></script>
 <!--Datatable plugins-->
 <script src="assets/plugins/datatables/jquery.dataTables.min.js"></script>
 <script src="assets/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>

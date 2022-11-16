@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="assets/css/fontawesome-free/css/all.min.css">
   
   <link rel="stylesheet" href="assets/css/icheck-bootstrap.min.css">
-  <link rel="stylesheet" href="assets/css/additional.css">
+  
   <link  href="assets/cropper/cropper.min.css" rel="stylesheet">
   <!-- Theme style -->
  
@@ -24,13 +24,15 @@
 
 <link rel="stylesheet" href="assets/dist/css/adminlte.min.css">
 
-
+<link rel="stylesheet" href="assets/css/additional.css">
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/6.6.9/sweetalert2.min.css">
-<link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
+<link rel="stylesheet" href="assets/plugins/toastr/toastr.min.css">
+
 <!--datatable-->
 <link rel="stylesheet" href="assets/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
 <link rel="stylesheet" href="assets/plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
 <link rel="stylesheet" href="assets/plugins/datatables-buttons/css/buttons.bootstrap4.min.css">
+
 
 </head>

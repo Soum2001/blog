@@ -5,8 +5,10 @@
     });
     $('#banner_btn').click(function(){
         $('#banner_imgupload').trigger('click');
+        
     });
-    
+   
+     
     
     var crop_class = {
         cropper : {},
@@ -126,14 +128,17 @@
                         processData: false,
                         contentType: false,
                         success:function(response){
-                            console.log(response);
-                            var jsonData=JSON.parse(response);
+                            
+                            var jsonData=JSON.parse(JSON.stringify(response));
         
                             console.log(jsonData);
                             if(jsonData.success)
                             {
                                 $("#crop_image").modal("hide");
-                                alert(jsonData.msg);
+                                //toastr.options.fadeout = 3000
+                                toastr.success(jsonData.msg,{ fadeOut:3000 });
+                                return false;
+
                             } 
                         
                         }
@@ -164,8 +169,8 @@
                         processData: false,
                         contentType: false,
                         success:function(response){
-                            console.log(response);
-                            var jsonData=JSON.parse(response);
+                           
+                            var jsonData=JSON.parse(JSON.stringify(response));
         
                             console.log(jsonData);
                             if(jsonData.success)
@@ -183,8 +188,92 @@
     
             }
         }
+        function new_gallery(){
+            var gallery_name=$("#gallery_name").val();
+            $.ajax({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
+                    'Accept': 'application/json', 
+                },
+                url:'add_new_gallery',
+                type:'post',
+                data:{new_gallery_name:gallery_name},
+                success:function(response){
+                   
+                    var jsonData = JSON.parse(JSON.stringify(response));
+                   
+                    if(jsonData.dbStatus)
+                    {
+                        $('#add_gallery_modal').modal('hide');
+                        toastr.success(jsonData.dbMessage);
+                        $("#gallery_name").val('');
+
+                    }
+                    else{
+                        $('#add_gallery_modal').modal('hide');
+                        toastr.error(jsonData.dbMessage);
+                        $("#gallery_name").val('');
+                    }
+                }
+            });
+        }
     
+      $(document).ready(function(){
+        $("select.select_gallery").change (function () {   
+            
+            var select_gallery = $(this).val();  
+            
+            $.ajax({
+                type:'get',
+                url:'load_images',
+                data:{gallery_id:select_gallery},
+                success:function(response){
+                   //console.log(response);
+
+                   jQuery('#image_body').html(response);  
+                     var jsonData=JSON.parse(JSON.stringify(response));
+                     var no_of_img = jsonData.img_path.length;
+                    
+                  
+                    const image_body = document.querySelector("#image_body");
+                    
+                     for(var i=0;i<no_of_img;i++)
+                     {
+                        
+                        const img = document.createElement("img");
+                     
+                        img.src = jsonData.img_path[i];
+                       
+                        img. style. width = '250px';
+                        img.style.height  = '250px';
+                        img.style.padding ="5px";
+                        img.style.margin  ='5';
+                        img.style.margin = "auto";
+                       
+                        image_body.append(img);
+                       
+                        //console.log(jsonData.img_path[0]);
+                        //$("#img_field").attr('src', jsonData.img_path[i]);
+                       
+                     }
+                    // if(jsonData.success)
+                    // {
+                    //     alert(jsonData.msg);
+                    // } 
+                
+                }
+                
+            });
            
+          
+         });
+
+         $('#add_gallery').click(function(){ 
+          
+            $('#add_gallery_modal').modal('show');
+        });
+    
+      })     
 
 // function load_custom(input,id)
 // {

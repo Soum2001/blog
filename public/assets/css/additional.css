@@ -4,6 +4,19 @@
 body{
 background:#eee;
 }
+
+element.style {
+}
+.img-circle {
+    border-radius: 50%;
+}
+.profile-user-img {
+    border: 3px solid #adb5bd;
+    margin: 0 auto;
+    padding: 3px;
+    width: 198px;
+    height: 198px;
+}
 .panel-default{
     border: 1px solid #ced4da;
     border-radius: 5px;
