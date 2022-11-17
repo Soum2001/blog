@@ -188,6 +188,7 @@
     
             }
         }
+       
         function new_gallery(){
             var gallery_name=$("#gallery_name").val();
             $.ajax({
@@ -217,60 +218,221 @@
                 }
             });
         }
-    
-      $(document).ready(function(){
-        $("select.select_gallery").change (function () {   
-            
-            var select_gallery = $(this).val();  
-            
-            $.ajax({
-                type:'get',
-                url:'load_images',
-                data:{gallery_id:select_gallery},
-                success:function(response){
-                   //console.log(response);
+    function set_profile_pic(id){
+        $.ajax({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
+                'Accept': 'application/json', 
+            },
+            url:'set_profile_pic',
+            type:'post',
+            data:{pic_id:id},
+            success:function(response){
+               
+                var jsonData = JSON.parse(JSON.stringify(response));
+               
+                if(jsonData.dbStatus)
+                {
+                    $('#add_gallery_modal').modal('hide');
+                    toastr.success(jsonData.dbMessage);
+                    $("#gallery_name").val('');
 
-                   jQuery('#image_body').html(response);  
-                     var jsonData=JSON.parse(JSON.stringify(response));
-                     var no_of_img = jsonData.img_path.length;
-                    
-                  
-                    const image_body = document.querySelector("#image_body");
-                    
-                     for(var i=0;i<no_of_img;i++)
-                     {
-                        
-                        const img = document.createElement("img");
-                     
-                        img.src = jsonData.img_path[i];
-                       
-                        img. style. width = '250px';
-                        img.style.height  = '250px';
-                        img.style.padding ="5px";
-                        img.style.margin  ='5';
-                        img.style.margin = "auto";
-                       
-                        image_body.append(img);
-                       
-                        //console.log(jsonData.img_path[0]);
-                        //$("#img_field").attr('src', jsonData.img_path[i]);
-                       
-                     }
-                    // if(jsonData.success)
+                }
+                else{
+                    $('#add_gallery_modal').modal('hide');
+                    toastr.error(jsonData.dbMessage);
+                    $("#gallery_name").val('');
+                }
+            }
+        });
+    }
+    function select_image(gallery_id)
+    {
+        $.ajax({
+            type:'get',
+            url:'load_images',
+            data:{gallery_id:gallery_id},
+            success:function(response){
+                //console.log(response);
+
+                jQuery('#image_body').html(response);  
+                //     var jsonData=JSON.parse(JSON.stringify(response));
+                //     var no_of_img = jsonData.img_path.length;
+                
+                
+                // const image_body = document.querySelector("#image_body");
+
+                    // if(no_of_img==0)
                     // {
-                    //     alert(jsonData.msg);
-                    // } 
+                    //     var p = document.createElement("p");
+                    //     p.style.width = "100%";
+                    //     p.style.height = "100px";
+                    //     p.style.textAlign = "center";
+                    //     // p.style.background = "white";
+                    //     p.style.color = "black";
+                    //     p.style.fontSize = "30px";
+                    //     p.innerHTML = "No image found.Please add ";
+                        
+                    //     image_body.append(p);
+                    // }
+                    // for(var i=0;i<no_of_img;i++)
+                    // {
+                    
+                    // const img = document.createElement("img");
+                    
+                    // img.src = jsonData.img_path[i];
+                    
+                    // img. style. width = '250px';
+                    // img.style.height  = '250px';
+                    // img.style.padding ="5px";
+                    // img.style.margin  ='5';
+                    // img.style.margin = "auto";
+                    
+                    // image_body.append(img);
+                    
+                    // //console.log(jsonData.img_path[0]);
+                    // //$("#img_field").attr('src', jsonData.img_path[i]);
+                    
+                    // }
+                // if(jsonData.success)
+                // {
+                //     alert(jsonData.msg);
+                // } 
+            
+            }
+            
+        });
+    }
+    function remove_pic(id)
+    {
+        swal({
+            title: 'Are you sure to Delete?',
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes',
+            animation: true
+        }).then(function() {
+            $.ajax({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
+                    'Accept': 'application/json', 
+                },
+                type:'POST',
+                url:'remove_pic',
+                enctype: 'multipart/form-data',
+                data:{pic_id : id},
+                success:function(response){
+                   console.log(response);
+                    var jsonData=JSON.parse(JSON.stringify(response));
+                    console.log(jsonData);
+                    if(jsonData.success)
+                    {
+                        $('#image_body').load(location.href + ' #image_body');
+                        toastr.success(jsonData.dbMessage);
+                    }else{
+                        toastr.error(jsonData.dbMessage);
+                    }
                 
                 }
                 
             });
+        }, function(dismiss) {}).done();
+    }
+      $(document).ready(function(){
+        // $(".select_gallery").click (function () {   
+        //     var select_gallery = $(this).val();  
+        //     alert(select_gallery);
+        //     $.ajax({
+        //         type:'get',
+        //         url:'load_images',
+        //         data:{gallery_id:select_gallery},
+        //         success:function(response){
+        //            //console.log(response);
+
+        //            jQuery('#image_body').html(response);  
+        //              var jsonData=JSON.parse(JSON.stringify(response));
+        //              var no_of_img = jsonData.img_path.length;
+                    
+                  
+        //             const image_body = document.querySelector("#image_body");
+                    
+        //              for(var i=0;i<no_of_img;i++)
+        //              {
+                        
+        //                 const img = document.createElement("img");
+                     
+        //                 img.src = jsonData.img_path[i];
+                       
+        //                 img. style. width = '250px';
+        //                 img.style.height  = '250px';
+        //                 img.style.padding ="5px";
+        //                 img.style.margin  ='5';
+        //                 img.style.margin = "auto";
+                       
+        //                 image_body.append(img);
+                       
+        //                 //console.log(jsonData.img_path[0]);
+        //                 //$("#img_field").attr('src', jsonData.img_path[i]);
+                       
+        //              }
+        //             // if(jsonData.success)
+        //             // {
+        //             //     alert(jsonData.msg);
+        //             // } 
+                
+        //         }
+                
+        //     });
            
           
-         });
+        //  });
 
          $('#add_gallery').click(function(){ 
           
             $('#add_gallery_modal').modal('show');
+        });
+        $('#remove_pic').click(function(){ 
+            var checked = document.querySelectorAll(".delete-checkbox:checked");
+            var arr = [];
+            checked.forEach((elem) => {
+                console.log(elem.id);
+                arr.push(elem.id);
+            })
+            swal({
+                title: 'Are you sure to Delete?',
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes',
+                animation: true
+            }).then(function() {
+                $.ajax({
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
+                        'Accept': 'application/json', 
+                    },
+                    type:'POST',
+                    url:'delete_photos',
+                    enctype: 'multipart/form-data',
+                    data:{delete_id : arr},
+                    success:function(response){
+                       console.log(response);
+                        var jsonData=JSON.parse(JSON.stringify(response));
+                        console.log(jsonData);
+                        if(jsonData.success)
+                        {
+                            toastr.success(jsonData.dbMessage);
+                        }else{
+                            toastr.error(jsonData.dbMessage);
+                        }
+                    
+                    }
+                    
+                });
+            }, function(dismiss) {}).done();
         });
     
       })     

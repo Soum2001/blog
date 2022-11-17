@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 //use Facade\FlareClient\Stacktrace\File;
 use Illuminate\Http\Request;
+use App\Models\UserDetailsModel;
 use PhpOption\None;
 use PhpParser\Node\Expr\Empty_;
 
@@ -94,35 +95,61 @@ class ImageUploadController extends Controller
         $select_user_galleries  =   GalleryTypesModel::select('gallery_type.gallery_name', 'gallery_type.id')
             ->join('user_galleries', 'user_galleries.gallery_type_id', '=', 'gallery_type.id')
             ->where('user_galleries.user_id', '=', $login_id)->get();
+
+        $select_user = UserDetailsModel::where('user_type', 1)->get();
+
         $select_profile_pic =  ImageUploadModel::select('img_path')
             ->join('user_galleries', 'image_upload.user_gallery_id', '=', 'user_galleries.id')
             ->where('user_galleries.gallery_type_id', '=', 1)
             ->where('image_upload.flag', '=', 1)
             ->where('user_galleries.user_id', '=', $login_id)->get();
 
-        return view('user_profile')->with(array('gallery_type' => $select_user_galleries, 'load' => 'gallery','select_profile' => $select_profile_pic));
+        return view('user_profile')->with(array('user_details' => $select_user, 'gallery_type' => $select_user_galleries, 'load' => 'gallery', 'select_profile' => $select_profile_pic));
     }
     function loadImages(Request $request)
     {
-        $output = array('img_path' => array());
+        // $output = array('img_path' => array());
         $gallery_id =   $request->input('gallery_id');
 
         $login_id = session('login_id');
 
-        $select_image  =   ImageUploadModel::select('image_upload.img_path')
+        $select_image  =   ImageUploadModel::select('image_upload.img_path', 'image_upload.id')
             ->join('user_galleries', 'user_galleries.id', '=', 'image_upload.user_gallery_id')
             ->where('user_galleries.user_id', '=', $login_id)
             ->where('user_galleries.gallery_type_id', '=', $gallery_id)
             ->get();
-        foreach ($select_image as $image) {
-
-            // $imageData = base64_encode(file_get_contents(asset('storage').'/'.$image->img_path));
-
-            // // Format the image SRC:  data:{mime};base64,{data};
-            // $src = 'data: '.mime_content_type($image->img_path).';base64,'.$imageData;
-            // $output['img_path'][]=$src;
-            $output['img_path'][] = (asset('storage') . '/' . $image->img_path);
+        if (empty($select_image)){
+            echo('hi');
+            $output = '<p style="width:100%;height:100px;text-align:center;color:black;font-Size:40px">No Image Found For This Gallery</p>';
+        } else {
+            
+            $output = '<div class="row">';
+            foreach ($select_image as $image) {
+                $img = (asset('storage') . '/' . $image->img_path);
+                $output .=  '
+                <div class="col-sm-4">
+                <img class="img-fluid pad" style="height:318px;width:496px" src=' . "$img" . '>
+                    <input type="checkbox" class="delete-checkbox" id=' . $image->id . '>
+                    <p>Profile_Image.jpg</p>
+                    <button type="button" class="btn btn-outline-danger  btn-xs float-right" onclick="remove_pic(' . $image->id . ')"><i class="fas fa-trash"></i> Remove</button>
+                    <button type="button" class="btn btn-outline-dark  btn-xs float-right" onclick="set_profile_pic(' . $image->id . ')">Set Profile Pic</button>
+                    <span class="float-left text-xs">
+                        <strong>Uploaded On:</strong>
+                        <i>15th November, 2022</i>
+                    </span>
+                    </div>';
+            }
+            $output .=  '</div>';
         }
+        // foreach ($select_image as $image) {
+
+        //     // $imageData = base64_encode(file_get_contents(asset('storage').'/'.$image->img_path));
+
+        //     // // Format the image SRC:  data:{mime};base64,{data};
+        //     // $src = 'data: '.mime_content_type($image->img_path).';base64,'.$imageData;
+        //     // $output['img_path'][]=$src;
+        //     $output['img_path'][] = (asset('storage') . '/' . $image->img_path);
+        // }
 
         // $output['load']='image';
 
@@ -180,6 +207,65 @@ class ImageUploadController extends Controller
                 }
             }
         }
+        return response()->json($output);
+    }
+    function delete_photos(Request $request)
+    {
+        $output =   array('dbStatus' => '', 'dbMessage' => '');
+        if (empty($request->delete_id)) {
+
+            $output['dbStatus'] =  0;
+            $output['dbMessage'] =  'Please select image to delete';
+        } else {
+
+            $delete_pics  =   ImageUploadModel::whereIn('id', $request->delete_id)->delete();
+
+            if ($delete_pics) {
+                $output['dbStatus'] =  1;
+                $output['dbMessage'] =  'Photos Deleted';
+            } else {
+                $output['dbStatus'] =  0;
+                $output['dbMessage'] =  'Some error Occured';
+            }
+        }
+        return response()->json($output);
+    }
+    function remove_pic(Request $request)
+    {
+        $output =   array('dbStatus' => '', 'dbMessage' => '');
+        $delete_pics  =   ImageUploadModel::where('id', $request->pic_id)->delete();
+
+        if ($delete_pics) {
+            $output['dbStatus'] =  1;
+            $output['dbMessage'] =  'Photo Deleted';
+        } else {
+            $output['dbStatus'] =  0;
+            $output['dbMessage'] =  'Some error Occured';
+        }
+
+        return response()->json($output);
+    }
+    function set_profile_pic(Request $request)
+    {
+        $output =   array('dbStatus' => '', 'dbMessage' => '');
+        $select_user_gallery_id  =   ImageUploadModel::where('id', $request->pic_id)->get();
+        foreach ($select_user_gallery_id as $user_gallery_id) {
+            $user_gallery_id = $user_gallery_id->user_gallery_id;
+        }
+        if ($select_user_gallery_id) {
+            $update_flag_zero  =   ImageUploadModel::where('user_gallery_id', $user_gallery_id)->update(array('flag' => 0));
+        }
+        if ($update_flag_zero) {
+            $update_flag_one  =   ImageUploadModel::where('id', $request->pic_id)->update(array('flag' => 1));
+        }
+        if ($update_flag_one) {
+            $output['dbStatus'] =  1;
+            $output['dbMessage'] =  'Profile Pic Uploaded';
+        } else {
+            $output['dbStatus'] =  0;
+            $output['dbMessage'] =  'Some error Occured';
+        }
+
         return response()->json($output);
     }
 }

@@ -51,3 +51,6 @@ Route::get('/upload_gallery', [ImageUploadController::class, 'fetchGalleries']);
 
 Route::get('/load_images', [ImageUploadController::class, 'loadImages']);
 Route::post('/add_new_gallery', [ImageUploadController::class, 'loadNewGallery']);
+Route::post('/delete_photos', [ImageUploadController::class, 'delete_photos']);
+Route::post('/remove_pic', [ImageUploadController::class, 'remove_pic']);
+Route::post('/set_profile_pic', [ImageUploadController::class, 'set_profile_pic']);

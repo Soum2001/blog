@@ -25,7 +25,8 @@
 <link rel="stylesheet" href="assets/dist/css/adminlte.min.css">
 
 <link rel="stylesheet" href="assets/css/additional.css">
-
+<!-- <link rel="stylesheet" href="assets/plugins/sweetalert2/sweetalert2.min.css">
+<link rel="stylesheet" href="assets/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css"> -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/6.6.9/sweetalert2.min.css">
 <link rel="stylesheet" href="assets/plugins/toastr/toastr.min.css">
 

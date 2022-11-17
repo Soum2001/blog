@@ -29,7 +29,10 @@
         <!-- Sidebar user (optional) -->
         <div class="user-panel mt-3 pb-3 mb-3 d-flex">
           <div class="image">
-            <img src="assets/image/default-avatar.png" class="img-circle elevation-2">
+            @foreach($select_profile as $profile_pic)
+            <?php $img = 'storage/' . $profile_pic->img_path; ?>
+            <img src="{{asset($img)}}" class="img-circle elevation-2">
+            @endforeach
           </div>
           <div class="info">
             <a href="#" class="d-block">Soumya</a>
@@ -85,7 +88,12 @@
         <div class="container-fluid">
           <div class="row mb-2">
             <div class="col-sm-6">
+            @if($load!='gallery')
               <h1>Profile</h1>
+            @endif
+            @if($load=='gallery')
+              <h1>Gallery</h1>
+            @endif
             </div>
 
           </div>
@@ -96,7 +104,7 @@
         <div class="container-fluid">
           <div class="row">
             <div class="col-md-12">
-
+            @if($load!='gallery')
               <!-- Profile Image -->
               <div class="card card-primary card-outline">
                 <div class="card-body box-profile">
@@ -122,7 +130,9 @@
                     <meta name="csrf-token" content="{{ csrf_token() }}">
                     <input type="hidden" id="_token" name="_token" value="{{ csrf_token() }}" />
                     <h3 class="profile-username text-center"><b><span id="head_username" name="head_username"></span> </b></h3>
-                    <p class="text-muted text-center">student</p>
+                    @foreach($user_details as $user_data)
+                    <p class="text-muted text-center"><b>{{$user_data->username}}</b></p>
+                    @endforeach
                     <input type="file" id="banner_imgupload" name="banner_imgupload" onchange="crop_class.loadbanner_img(this,2)" style="display:none" />
                     <i class="btn btn-primary" id="banner_btn">banner upload</i>
                     @include('layouts.partials.modal')
@@ -135,6 +145,7 @@
                 <!-- /.card-body -->
               </div>
               <!-- /.card -->
+              @endif
 
               <!-- About Me Box -->
               @if($load=='user_details')
@@ -160,78 +171,80 @@
               </div>
               @endif
               <!-- /.card -->
-            </div>
-            @if($load=='gallery')
-            <div class="card-body">
-
-              <div class="card card-primary">
-                <div class="card-header">
-                  <div class="form-group">
-                    <h3 class="card-title">
-
-                      <label>Select Gallery</label>
-                      <select class="form-control select_gallery">
-                        <option>--select--</option>
-                        @foreach($gallery_type as $user_gallery)
-                        <option id="{{$user_gallery->id}}" value="{{$user_gallery->id}}">{{$user_gallery->gallery_name}}</option>
-                        @endforeach
-                      </select>
-
-                    </h3>
-                  </div>
-                  <div class="project-actions text-right">
-                    <button class="btn btn-primary btn-lg" id="add_gallery">
-                      Add Gallery
-                    </button>
-                  </div>
-                </div>
-
-                <div class="card-body" id="image_body">
-
-                </div>
-
+              @if($load=='gallery')
+              <div class="card-header d-flex p-0">
+              
+                <h3 class="card-title p-3"></h3>
+                
+                <ul class="nav nav-pills ml-auto p-2">
+                  <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#">
+                      Select Gallery <span class="caret"></span>
+                    </a>
+                    <div class="dropdown-menu">
+                      @foreach($gallery_type as $user_gallery)
+                      <?php $gallery_id = $user_gallery->id; ?>
+                      <a class="dropdown-item select_gallery" tabindex="-1" onclick="select_image(<?= $gallery_id ?>)" id="{{$user_gallery->id}}" value="{{$user_gallery->id}}">{{$user_gallery->gallery_name}}</a>
+                      @endforeach
+                    </div>
+                  </li>
+                  <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#">
+                      Action <span class="caret"></span>
+                    </a>
+                    <div class="dropdown-menu">
+                      <a class="dropdown-item" tabindex="-1" id="add_gallery">Add Gallery</a>
+                      <a class="dropdown-item" tabindex="-1" id="remove_pic">Remove Photos</a>
+                  </li>
+                </ul>
               </div>
-              <!-- /.tab-content -->
+              <div class="card-body" id="image_body">
+                <p style="width:100%;height:100px;text-align:center;color:black;font-Size:50px">No Gallery Found</p>
+              </div>
+              @endif
             </div>
-            @endif
-            <!-- /.card-body -->
-
           </div>
-          <!-- /.card -->
-          <!--</div> -->
-          <!-- /.col -->
-        </div>
-        <!-- /.row -->
-
-
-    </div><!-- /.container-fluid -->
-    </section>
-    <!-- /.content -->
-    <div class="modal fade" id="add_gallery_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-
-          <input type="hidden" id="new_galley_id">
-          <div class="modal-body">
-            <meta name="csrf-token" content="{{ csrf_token() }}">
-            <input type="hidden" id="_token" name="_token" value="{{ csrf_token() }}" />
-            <label>gallery name</label>
-            <input type="text" id="gallery_name" name="gallery_name" class="form-control sm">
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            <button type="button" class="btn btn-primary" id="new_gallery" onclick="new_gallery()">Add Gallery</button>
-          </div>
+          <!-- /.tab-content -->
+          <!-- </div>
+          
+        /.card-body -->
 
         </div>
+        <!-- /.card -->
+        <!--</div> -->
+        <!-- /.col -->
+    </div>
+    <!-- /.row -->
+
+
+  </div><!-- /.container-fluid -->
+  </section>
+  <!-- /.content -->
+  <div class="modal fade" id="add_gallery_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+        <input type="hidden" id="new_galley_id">
+        <div class="modal-body">
+          <meta name="csrf-token" content="{{ csrf_token() }}">
+          <input type="hidden" id="_token" name="_token" value="{{ csrf_token() }}" />
+          <label>gallery name</label>
+          <input type="text" id="gallery_name" name="gallery_name" class="form-control sm">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary" id="new_gallery" onclick="new_gallery()">Add Gallery</button>
+        </div>
+
       </div>
     </div>
+  </div>
 
   </div>
   <!-- /.content-wrapper -->
