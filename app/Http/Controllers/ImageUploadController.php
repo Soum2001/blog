@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use Illuminate\Notifications\Notification;
 use App\Models\GalleryTypesModel;
 use App\Models\ImageUploadModel;
 use App\Models\UserGalleriesModel;
@@ -9,9 +9,13 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 //use Facade\FlareClient\Stacktrace\File;
 use Illuminate\Http\Request;
-use App\Models\UserDetailsModel;
+use App\Models\User;
+//use Facade\FlareClient\Http\Client;
 use PhpOption\None;
 use PhpParser\Node\Expr\Empty_;
+use PhpParser\Node\Expr\Throw_;
+use Throwable;
+use Twilio\Rest\Client;
 
 class ImageUploadController extends Controller
 {
@@ -64,16 +68,22 @@ class ImageUploadController extends Controller
                     $image_upload->img_path          =   $new_image;
                     $image_upload->user_gallery_id   =   $user_galleries_id;
                     $image_upload->flag              =   1;
+                    $image_upload->created_at        =   now();
+                    $image_upload->updated_at         =   now();
                     $image_upload->save();
                 } else {
 
                     $user_gallery->user_id         =   $login_id;
                     $user_gallery->gallery_type_id =   $gallery_type_id;
+                    $user_gallery->created_at      =   now();
+                    $user_gallery->updated_at      =   now();
                     $user_gallery->save();
 
                     $image_upload->img_path          =   $new_image;
                     $image_upload->user_gallery_id   =   $user_gallery->id;
                     $image_upload->flag              =   1;
+                    $image_upload->created_at        =   now();
+                    $image_upload->updated_at         =   now();
                     $image_upload->save();
                 }
             }
@@ -89,14 +99,24 @@ class ImageUploadController extends Controller
         }
         return response()->json($output);
     }
-    function fetchGalleries()
+    function fetchGalleries(Request $request)
     {
-        $login_id = session('login_id');
+        if ($request->user_id == '') {
+            $login_id = session('login_id');
+        } else {
+            session()->pull('login_id');
+            session()->put('login_id', $request->user_id);
+            $login_id = session('login_id');
+        }
+        $user_type = session('user_type');
+
         $select_user_galleries  =   GalleryTypesModel::select('gallery_type.gallery_name', 'gallery_type.id')
             ->join('user_galleries', 'user_galleries.gallery_type_id', '=', 'gallery_type.id')
             ->where('user_galleries.user_id', '=', $login_id)->get();
 
-        $select_user = UserDetailsModel::where('user_type', 1)->get();
+        $select_user = User::where('id', $login_id)->get();
+
+        $select_all_user = User::where('user_type', 2)->get();
 
         $select_profile_pic =  ImageUploadModel::select('img_path')
             ->join('user_galleries', 'image_upload.user_gallery_id', '=', 'user_galleries.id')
@@ -104,54 +124,96 @@ class ImageUploadController extends Controller
             ->where('image_upload.flag', '=', 1)
             ->where('user_galleries.user_id', '=', $login_id)->get();
 
-        return view('user_profile')->with(array('user_details' => $select_user, 'gallery_type' => $select_user_galleries, 'load' => 'gallery', 'select_profile' => $select_profile_pic));
+        $select_banner_pic =  ImageUploadModel::select('img_path')
+            ->join('user_galleries', 'image_upload.user_gallery_id', '=', 'user_galleries.id')
+            ->where('user_galleries.gallery_type_id', '=', 2)
+            ->where('image_upload.flag', '=', 1)
+            ->where('user_galleries.user_id', '=', $login_id)->get();
+
+        //print_r($select_banner_pic->img_path);
+
+        return view('user_profile')->with(array('user_type' => $user_type, 'all_user_name' => $select_all_user, 'user_details' => $select_user, 'gallery_type' => $select_user_galleries, 'load' => 'gallery', 'select_banner' => $select_banner_pic, 'select_profile' => $select_profile_pic));
     }
     function loadImages(Request $request)
     {
         // $output = array('img_path' => array());
         $gallery_id =   $request->input('gallery_id');
-
+        
         $login_id = session('login_id');
-
+        
         $select_image  =   ImageUploadModel::select('image_upload.img_path', 'image_upload.id')
             ->join('user_galleries', 'user_galleries.id', '=', 'image_upload.user_gallery_id')
             ->where('user_galleries.user_id', '=', $login_id)
             ->where('user_galleries.gallery_type_id', '=', $gallery_id)
             ->get();
-        if (empty($select_image)){
-            echo('hi');
-            $output = '<p style="width:100%;height:100px;text-align:center;color:black;font-Size:40px">No Image Found For This Gallery</p>';
-        } else {
+        if ($gallery_id != 1 && $gallery_id != 2) {
             
-            $output = '<div class="row">';
-            foreach ($select_image as $image) {
-                $img = (asset('storage') . '/' . $image->img_path);
-                $output .=  '
+                $output = '<div class="row">
+                            <div class="col-sm-4">
+                            
+                                <button class="btn btn-primary">
+                                    <input type="file" id="custom_img" name="custom_img" onchange="crop_class.load_custom(this,' . $gallery_id . ')">
+                                </button>
+                                <button type="button" class="btn btn-primary" id="crop-custom-img">Upload</button>
+                            
+                            </div>';
+           
+                foreach ($select_image as $image) {
+                    $img = (asset('storage') . '/' . $image->img_path);
+                    $output .=  '
+                            <div class="col-sm-4">
+                                <img class="img-fluid pad" style="height:318px;width:496px" src=' . "$img" . '>
+                                <input type="checkbox" class="delete-checkbox" id=' . $image->id . '>
+                                <p>Profile_Image.jpg</p>
+                                <button type="button" class="btn btn-outline-danger  btn-xs float-right" onclick="remove_pic(' . $image->id . ','.$gallery_id.')"><i class="fas fa-trash"></i> Remove</button>';
+                                if ($gallery_id == 1)
+                                {
+                                $output .=  '<button type="button" class="btn btn-outline-dark  btn-xs float-right" onclick="set_profile_pic(' . $image->id . ')">Set Profile Pic</button>';
+                                }
+                                $output .= ' <span class="float-left text-xs">
+                                    <strong>Uploaded On:</strong>
+                                    <i>15th November, 2022</i>
+                                </span>
+                            </div>';
+                }
+        } else {
+            if (empty($select_image)) {
+                $output = '<p style="width:100%;height:100px;text-align:center;color:black;font-Size:40px">No Image Found For This Gallery</p>';
+            } else {
+                $output = '<div class="row">';
+                foreach ($select_image as $image) {
+                    $img = (asset('storage') . '/' . $image->img_path);
+                    $output .=  '
                 <div class="col-sm-4">
-                <img class="img-fluid pad" style="height:318px;width:496px" src=' . "$img" . '>
+                    <img class="img-fluid pad" style="height:318px;width:496px" src=' . "$img" . '>
                     <input type="checkbox" class="delete-checkbox" id=' . $image->id . '>
                     <p>Profile_Image.jpg</p>
-                    <button type="button" class="btn btn-outline-danger  btn-xs float-right" onclick="remove_pic(' . $image->id . ')"><i class="fas fa-trash"></i> Remove</button>
-                    <button type="button" class="btn btn-outline-dark  btn-xs float-right" onclick="set_profile_pic(' . $image->id . ')">Set Profile Pic</button>
-                    <span class="float-left text-xs">
+                    <button type="button" class="btn btn-outline-danger  btn-xs float-right" onclick="remove_pic(' . $image->id . ','.$gallery_id.')"><i class="fas fa-trash"></i> Remove</button>';
+                    if ($gallery_id == 1)
+                    {
+                    $output .=  '<button type="button" class="btn btn-outline-dark  btn-xs float-right" onclick="set_profile_pic(' . $image->id . ')">Set Profile Pic</button>';
+                    }
+                    $output .= ' <span class="float-left text-xs">
                         <strong>Uploaded On:</strong>
                         <i>15th November, 2022</i>
                     </span>
-                    </div>';
+                </div>';
+                }
             }
-            $output .=  '</div>';
+            //$output .=  $select_image->links();
         }
-        // foreach ($select_image as $image) {
+        $output .=  '</div>';
+        // // foreach ($select_image as $image) {
 
-        //     // $imageData = base64_encode(file_get_contents(asset('storage').'/'.$image->img_path));
+        // //     // $imageData = base64_encode(file_get_contents(asset('storage').'/'.$image->img_path));
 
-        //     // // Format the image SRC:  data:{mime};base64,{data};
-        //     // $src = 'data: '.mime_content_type($image->img_path).';base64,'.$imageData;
-        //     // $output['img_path'][]=$src;
-        //     $output['img_path'][] = (asset('storage') . '/' . $image->img_path);
-        // }
+        // //     // // Format the image SRC:  data:{mime};base64,{data};
+        // //     // $src = 'data: '.mime_content_type($image->img_path).';base64,'.$imageData;
+        // //     // $output['img_path'][]=$src;
+        // //     $output['img_path'][] = (asset('storage') . '/' . $image->img_path);
+        // // }
 
-        // $output['load']='image';
+        // // $output['load']='image';
 
         return response()->json($output);
     }
@@ -191,12 +253,15 @@ class ImageUploadController extends Controller
 
             $gallery_type = new GalleryTypesModel;
             $gallery_type->gallery_name = $request->new_gallery_name;
+            $gallery_type->created_at   = now();
+            $gallery_type->updated_at   = now();
             if ($gallery_type->save()) {
                 $gallery_type_id = $gallery_type->id;
 
                 $user_gallery->user_id          =   $login_id;
                 $user_gallery->gallery_type_id  =   $gallery_type_id;
-
+                $user_gallery->created_at       =   now();
+                $user_gallery->updated_at       =   now();
                 if ($user_gallery->save()) {
 
                     $output['dbStatus'] =  1;
@@ -212,6 +277,11 @@ class ImageUploadController extends Controller
     function delete_photos(Request $request)
     {
         $output =   array('dbStatus' => '', 'dbMessage' => '');
+        // $select_galley_id  =   UserGalleriesModel::select('user_galleries.gallery_type_id')
+        // ->join('user_galleries', 'user_galleries.id', '=', 'image_upload.user_gallery_id')
+        // ->whereIn('id', $request->pic_id)
+        // ->get();
+        //echo($select_galley_id );
         if (empty($request->delete_id)) {
 
             $output['dbStatus'] =  0;
@@ -232,7 +302,14 @@ class ImageUploadController extends Controller
     }
     function remove_pic(Request $request)
     {
-        $output =   array('dbStatus' => '', 'dbMessage' => '');
+
+        $output       =   array('dbStatus' => '', 'dbMessage' => '');
+        
+        // $delete_pics  =   UserGalleriesModel::select('user_galleries.gallery_type_id')
+        //     ->join('user_galleries', 'user_galleries.id', '=', 'image_upload.user_gallery_id')
+        //     ->where('id', $request->pic_id)
+        //     ->get();
+        // echo ($delete_pics);
         $delete_pics  =   ImageUploadModel::where('id', $request->pic_id)->delete();
 
         if ($delete_pics) {
@@ -254,18 +331,71 @@ class ImageUploadController extends Controller
         }
         if ($select_user_gallery_id) {
             $update_flag_zero  =   ImageUploadModel::where('user_gallery_id', $user_gallery_id)->update(array('flag' => 0));
+            if ($update_flag_zero) {
+                $update_flag_one  =   ImageUploadModel::where('id', $request->pic_id)->update(array('flag' => 1));
+                if ($update_flag_one) {
+                    $output['dbStatus'] =  1;
+                    $output['dbMessage'] =  'Profile Pic Uploaded';
+                } else {
+                    $output['dbStatus'] =  0;
+                    $output['dbMessage'] =  'Some error Occured';
+                }
+            }
         }
-        if ($update_flag_zero) {
-            $update_flag_one  =   ImageUploadModel::where('id', $request->pic_id)->update(array('flag' => 1));
-        }
-        if ($update_flag_one) {
+        return response()->json($output);
+    }
+    function editUser(Request $request)
+    {
+        $output =   array('dbStatus' => '', 'dbMessage' => '');
+        $update_user = User::where('id', $request->id)
+                 ->update(array('name' => $request->name, 'email' => $request->email, 'address' => $request->address, 'phone_no' => $request->phn_no));
+        if($update_user)
+        {
             $output['dbStatus'] =  1;
-            $output['dbMessage'] =  'Profile Pic Uploaded';
-        } else {
+            $output['dbMessage'] =  'Profile Updated';
+        }else {
             $output['dbStatus'] =  0;
             $output['dbMessage'] =  'Some error Occured';
         }
-
         return response()->json($output);
     }
+    // function send($notifiable, Notification $notification)
+    // {
+    //     try{
+
+    //         $to = $notifiable->routeNotificationFor('WhatsApp');
+    //         $from = config('services.twilio.whatsapp_from');
+    //         $account_sid = env('TWILIO_SID');
+    //         $account_token =env('TWILIO_AUTH_TOKEN');
+    //         $number =env('TWILIO_WHATSAPP_NUMBER');
+
+    //         $client = new Client($account_sid,$account_token);
+    
+    //         $client->messages->create('+916371668018',[
+    //             'from'=>$number,
+    //             'body'=>'hi'
+    //         ]);
+    //         return 'message sent';
+    //     }
+    //     catch(Throwable $e){
+    //         return $e->getMessage();
+    //     }
+    // }
+    // public function send($notifiable, Notification $notification)
+    // {
+    //     $message = $notification->toWhatsApp($notifiable);
+
+
+    //     $to = $notifiable->routeNotificationFor('WhatsApp');
+    //     $from = config('services.twilio.whatsapp_from');
+
+
+    //     $twilio = new Client(config('services.twilio.sid'), config('services.twilio.token'));
+
+
+    //     return $twilio->messages->create('whatsapp:' . $to, [
+    //         "from" => 'whatsapp:' . $from,
+    //         "body" => $message->content
+    //     ]);
+    // }
 }

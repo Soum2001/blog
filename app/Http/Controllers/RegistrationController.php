@@ -2,45 +2,54 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\UserDetailsModel;
+use App\Models\User;
 use Illuminate\Http\Request;
 use PharIo\Manifest\AuthorCollection;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\SendOtp;
-
+use Illuminate\Support\Facades\Auth;
 
 class RegistrationController extends Controller
 {
     //
-    function loadRegistrationPage(){
-        // $user_details= UserDetailsModel::all();
-        // return $user_details;
+    // public function __construct()
+    // {
+    //     $this->middleware('auth:web');
+    // }
+    function loadRegistrationPage()
+    {
+        // $user= User::all();
+        // return $user;
         return view('register');
     }
-    function loadForgetPasswordPage(){
-        // $user_details= UserDetailsModel::all();
-        // return $user_details;
+    function loadForgetPasswordPage()
+    {
+        // $user= User::all();
+        // return $user;
         return view('forget_password');
     }
-    function formData(Request $request){
+    function formData(Request $request)
+    {
+
         //print_r($request->input());
         //$output = array('dbStatus'=>'','dbMessage'=>'');
-        $user_details             = new UserDetailsModel;
-        $user_details->username   = $request->user_name;
-        $hashedPassword           = Hash::make( $request->password);
-        $user_details->password   = $hashedPassword;
-        
+        $user             = new User;
+        $user->name   = $request->user_name;
+        $hashedPassword           = Hash::make($request->password);
+        $user->password   = $hashedPassword;
         //Hash::make('secret');
-        $user_details->email      = $request->email;
-        $user_details->address    = $request->addres;
-        $user_details->phone_no   = $request->phnno;
-        $user_details->user_type  = 2;
-        $user_details->active     = 1;
-        // $user_details->created_at = now();
-        // $user_details->updated_at = now();
-        $user_details->save();
+        $user->email          = $request->email;
+        $user->address        = $request->addres;
+        $user->phone_no       = $request->phnno;
+        $user->user_type      = 2;
+        $user->_token         = $request->_token;
+        $user->active         = 1;
+
+        // $user->created_at = now();
+        // $user->updated_at = now();
+        $user->save();
         // if($register)
         //  {
         //      $output['dbStatus']  = 'SUCCESS';
@@ -54,68 +63,91 @@ class RegistrationController extends Controller
     }
     public function checkAuth(Request $request)
     {
-       
-        $user=UserDetailsModel::where('email',$request->mail_id)->first();
+        echo($request->id);
 
-        session()-> put('login_id',$user->id);
+        $input = $request->all();
+        $input   = $request->only('email', 'password');
+        if (Auth::attempt($input)) {
 
-        if(!$user || !Hash::check($request->passsword,$user->password))
-        {
-            return view('user_not_found');
-        }
-        else{
-            if($user->user_type==1)
-            {
-                return view('admin_page');
+            $user = User::where('email', Auth::user()->email)->first();
+            session()->put('login_id', $user->id);
+
+            if (Auth::user()->user_type == 1) {
+                session()->put('user_type', 'admin');
+                return redirect('/admindashboard');
+            } else {
+                session()->put('user_type', 'user');
+                return redirect('/dashboard');
             }
-            else{
-                return view('user_profile');
-            }
-            
+        } else {
+            return back()->with('error', 'username and passsword is incorrect');
         }
     }
+    // public function loadLogin()
+    // {
+    //     if(Auth::user() && Auth::user()->user_type == 1)
+    //     {
+    //         return redirect('/admindashboard');
+    //     }
+    //     else if(Auth::user() && Auth::user()->user_type == 2)
+    //     {
+    //         return redirect('/dashboard');
+    //     }
+    //     return view('welcome');
+    // }
     public function requestPassword(Request $request)
     {
-        $otp = rand(100000,999999);
-        Log::info("otp = ".$otp);
-        $user = UserDetailsModel::where('email','=',$request->otp_email)->update(['otp' => $otp]);
+        $otp = rand(100000, 999999);
+        Log::info("otp = " . $otp);
+        $user = User::where('email', '=', $request->otp_email)->update(['otp' => $otp]);
 
-        if($user){
+        if ($user) {
 
-        $mail_details = [
-            //'subject' => 'Testing Application OTP',
-            'otp' => $otp
-        ];
+            $mail_details = [
+                //'subject' => 'Testing Application OTP',
+                'otp' => $otp
+            ];
 
-        Mail::to($request->otp_email)->send(new SendOtp($mail_details));
+            Mail::to($request->otp_email)->send(new SendOtp($mail_details));
 
-            session()-> put('mail',$request->otp_email);
-        
+            session()->put('mail', $request->otp_email);
+
             return view("otp_front");
-        }
-        else{
+        } else {
             return 'Invalid';
         }
-
     }
     public function verifyOtp(Request $request)
     {
         $otp          = $request->otp;
-        $user_details = UserDetailsModel::where('otp', $otp)->get();;
-        if($user_details)
-        {
+        $user = User::where('otp', $otp)->get();;
+        if ($user) {
             return view('reset_password');
         }
     }
     public function getNewPassword(Request $req)
     {
-        $mail= session('mail');
-        $check_mail=UserDetailsModel::where('email',$mail )->update(array('password'=>Hash::make($req->chng_password)));
+        $mail = session('mail');
+        $check_mail = User::where('email', $mail)->update(array('password' => Hash::make($req->chng_password)));
         session()->pull('mail');
-        if($check_mail)
-        {
+        if ($check_mail) {
             return view('reset_password');
         }
+    }
+    public function loadAdminPage()
+    {
+        return view('admin_page');
+    }
+    public function loadUserPage()
+    {
         
+        return view('user');
+    }
+    public function logOut(Request $request)
+    {
+        //echo ('hi');
+        $request->session()->flush();
+        Auth::logout();
+        return redirect('/');
     }
 }

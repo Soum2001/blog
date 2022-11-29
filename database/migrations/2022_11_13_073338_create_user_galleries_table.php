@@ -17,7 +17,7 @@ class CreateUserGalleriesTable extends Migration
             $table->bigInteger('id')->autoIncrement();
             $table->bigInteger('user_id');
             $table->bigInteger('gallery_type_id');
-            $table->foreign('user_id')->references('id')->on('user_details');
+            $table->foreign('user_id')->references('id')->on('users');
             $table->foreign('gallery_type_id')->references('id')->on('gallery_type');
             $table->timestamps();
         });

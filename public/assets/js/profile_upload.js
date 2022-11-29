@@ -389,7 +389,7 @@
           
         //  });
 
-         $('#add_gallery').click(function(){ 
+        $('#add_gallery').click(function(){ 
           
             $('#add_gallery_modal').modal('show');
         });

@@ -18,7 +18,7 @@
       <meta name="csrf-token" content="{{ csrf_token() }}">
         <input type="hidden" id="_token" name="_token" value="{{ csrf_token() }}" />
         <div class="input-group mb-3">
-          <input type="email" class="form-control" id="mail_id" name="mail_id" placeholder="Email">
+          <input type="email" class="form-control" id="email" name="email" placeholder="Email">
           <div class="input-group-append">
             <div class="input-group-text">
               <span class="fas fa-envelope"></span>
@@ -26,7 +26,7 @@
           </div>
         </div>
         <div class="input-group mb-3">
-          <input type="password" class="form-control" id="passsword" name="passsword" placeholder="Password">
+          <input type="password" class="form-control" id="password" name="password" placeholder="Password">
           <div class="input-group-append">
             <div class="input-group-text">
               <span class="fas fa-lock"></span>

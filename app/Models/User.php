@@ -17,10 +17,15 @@ class User extends Authenticatable
      *
      * @var array<int, string>
      */
+    public $table='users';   
+
+
+
     protected $fillable = [
         'name',
         'email',
         'password',
+        'remember_token',
     ];
 
     /**
@@ -41,4 +46,10 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+
+    public function routeNotificationForSlack($notification)
+    {
+        return  env('SLACK_NOTIFICATION_WEBHOOK');
+    }
 }
