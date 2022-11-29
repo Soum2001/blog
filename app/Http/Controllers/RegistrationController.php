@@ -9,7 +9,9 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\SendOtp;
+use App\Models\ImageUploadModel;
 use Illuminate\Support\Facades\Auth;
+
 
 class RegistrationController extends Controller
 {
@@ -43,7 +45,7 @@ class RegistrationController extends Controller
         $user->email          = $request->email;
         $user->address        = $request->addres;
         $user->phone_no       = $request->phnno;
-        $user->user_type      = 2;
+        $user->user_type      = 1;
         $user->_token         = $request->_token;
         $user->active         = 1;
 
@@ -134,9 +136,16 @@ class RegistrationController extends Controller
             return view('reset_password');
         }
     }
-    public function loadAdminPage()
+    public function loadAdminDashboard(Request $req)
     {
-        return view('admin_page');
+        $login_id = session('login_id');
+        $select_profile_pic =  ImageUploadModel::select('img_path')
+        ->join('user_galleries', 'image_upload.user_gallery_id', '=', 'user_galleries.id')
+        ->where('user_galleries.gallery_type_id', '=', 1)
+        ->where('image_upload.flag', '=', 1)
+        ->where('user_galleries.user_id', '=', $login_id)->get();
+
+        return view('admin_page')->with(array('select_profile' => $select_profile_pic));
     }
     public function loadUserPage()
     {

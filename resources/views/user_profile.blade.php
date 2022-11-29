@@ -307,7 +307,7 @@
                       
                       <a class="dropdown-item" tabindex="-1" id="add_gallery">Add Gallery</a>
                       <a class="dropdown-item" tabindex="-1" id="remove_pic">Remove Photos</a>
-
+                      <a class="dropdown-item" tabindex="-1" id="send_to_wp">Send to WP</a>
                   </li>
                 </ul>
               </div>
@@ -370,13 +370,13 @@
         @if($load=='user_details')
         @foreach($user_details as $user_data)
         <?php $user_id = $user_data->id ?>
-        <form action="edit_user" id="user_form" method="post">
+        
           <div class="modal-body" id="user_details">
             <meta name="csrf-token" content="{{ csrf_token() }}">
             <input type="hidden" id="_token" name="_token" value="{{ csrf_token() }}" />
             <input type="hidden" id="user_id" name="user_id">
             <div class="input-group mb-3">
-              <input type="text" class="form-control" placeholder="Full name" id="user_name" name="user_name" value="{{$user_data->name}}">
+              <input type="text" class="form-control" placeholder="Full name" id="user_name" name="user_name" style="text-align:center" value="{{$user_data->name}}">
               <div class="input-group-append">
                 <div class="input-group-text">
                   <span class="fas fa-user"></span>
@@ -384,7 +384,7 @@
               </div>
             </div>
             <div class="input-group mb-3">
-              <input type="email" class="form-control" placeholder="Email" id="mail_id" name="mail_id" value="{{$user_data->email}}">
+              <input type="email" class="form-control" placeholder="Email" id="mail_id" name="mail_id" style="text-align:center" value="{{$user_data->email}}">
               <div class="input-group-append">
                 <div class="input-group-text">
                   <span class="fas fa-envelope"></span>
@@ -395,7 +395,7 @@
               <input class="form-control" placeholder="address" id="addres" name="addres" style="text-align:center" value="{{$user_data->address}}">
             </div>
             <div class="input-group mb-3">
-              <input type="tel" class="form-control" placeholder="Mobile no" id="mob" name="mob" value="{{$user_data->phone_no}}">
+              <input type="tel" class="form-control" placeholder="Mobile no" id="mob" name="mob" style="text-align:center" value="{{$user_data->phone_no}}">
               <div class="input-group-append">
                 <div class="input-group-text">
                   <span class="fas fa-phone"></span>
@@ -406,7 +406,7 @@
           <div class="modal-footer">
             <input type="submit" class="btn btn-primary" id="edit_user_details" onclick="edit_user_details(<?= $user_id ?>)" value="Edit">
           </div>
-        </form>
+     
         @endforeach
         @endif
 

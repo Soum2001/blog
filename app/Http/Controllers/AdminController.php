@@ -27,17 +27,17 @@ class AdminController extends Controller
 
         return view('user_profile')->with(array('user_type'=>$user_type,'user_details' => $select_user, 'load' => 'user_details', 'select_profile' => $select_profile_pic));
     }
-    public function loadAdminDashboard(Request $req)
-    {
-        $login_id = session('login_id');
-        $select_profile_pic =  ImageUploadModel::select('img_path')
-        ->join('user_galleries', 'image_upload.user_gallery_id', '=', 'user_galleries.id')
-        ->where('user_galleries.gallery_type_id', '=', 1)
-        ->where('image_upload.flag', '=', 1)
-        ->where('user_galleries.user_id', '=', $login_id)->get();
+    // public function loadAdminDashboard(Request $req)
+    // {
+    //     $login_id = session('login_id');
+    //     $select_profile_pic =  ImageUploadModel::select('img_path')
+    //     ->join('user_galleries', 'image_upload.user_gallery_id', '=', 'user_galleries.id')
+    //     ->where('user_galleries.gallery_type_id', '=', 1)
+    //     ->where('image_upload.flag', '=', 1)
+    //     ->where('user_galleries.user_id', '=', $login_id)->get();
 
-        return view('admin_page')->with(array('select_profile' => $select_profile_pic));
-    }
+    //     return view('admin_page')->with(array('select_profile' => $select_profile_pic));
+    // }
     public function userstatus_inactive(Request $req)
     {
         $output = array('dbStatus' => '', 'dbMessage' => '');
@@ -86,12 +86,18 @@ class AdminController extends Controller
     }
     public function editUserDetails(Request $req)
     {
+        $output = array('dbStatus' => '', 'dbMessage' => '');
         $update_user = User::where('id', $req->user_id)
             ->update(array('name' => $req->user_name, 'email' => $req->mail_id, 'address' => $req->addres, 'phone_no' => $req->mob));
 
         if ($update_user) {
-            return view('admin_page');
+            $output['dbStatus']  = 'SUCCESS';
+            $output['dbMessage'] = 'Data Updated.';
+        }else {
+            $output['dbStatus']  = 'FAILURE';
+            $output['dbMessage'] = 'OOPS! Someting Went Wrong in delete Operation.';
         }
+        return response()->json($output);
     }
     public function deleteUserDetails(Request $req)
     {

@@ -18,9 +18,7 @@ class CreateUserTypesTable extends Migration
             $table->string('role');
             $table->timestamps();
         });
-        Schema::create('users', function (Blueprint $table) {
-            $table->foreign('user_type')->references('id')->on('user_types');
-        });
+     
     }
 
     /**
@@ -31,6 +29,6 @@ class CreateUserTypesTable extends Migration
     public function down()
     {
         Schema::dropIfExists('user_types');
-        Schema::dropIfExists('users');
+        
     }
 }

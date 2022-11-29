@@ -11,14 +11,17 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 use App\Models\User;
 //use Facade\FlareClient\Http\Client;
+
 use PhpOption\None;
 use PhpParser\Node\Expr\Empty_;
 use PhpParser\Node\Expr\Throw_;
 use Throwable;
 use Twilio\Rest\Client;
+use App\Notifications\OrderProcessed;
 
 class ImageUploadController extends Controller
 {
+ 
     function imageUpload(Request $request)
     {
         // $validatedData = $request->validate([
@@ -359,28 +362,38 @@ class ImageUploadController extends Controller
         }
         return response()->json($output);
     }
-    // function send($notifiable, Notification $notification)
-    // {
-    //     try{
+    function send(Request $request)
+    {
+        // try{
 
-    //         $to = $notifiable->routeNotificationFor('WhatsApp');
-    //         $from = config('services.twilio.whatsapp_from');
-    //         $account_sid = env('TWILIO_SID');
-    //         $account_token =env('TWILIO_AUTH_TOKEN');
-    //         $number =env('TWILIO_WHATSAPP_NUMBER');
+        //     $to = $notifiable->routeNotificationFor('WhatsApp');
+        //     $from = config('services.twilio.whatsapp_from');
+        //     $account_sid = env('TWILIO_SID');
+        //     $account_token =env('TWILIO_AUTH_TOKEN');
+        //     $number =env('TWILIO_WHATSAPP_NUMBER');
 
-    //         $client = new Client($account_sid,$account_token);
+        //     $client = new Client($account_sid,$account_token);
     
-    //         $client->messages->create('+916371668018',[
-    //             'from'=>$number,
-    //             'body'=>'hi'
-    //         ]);
-    //         return 'message sent';
-    //     }
-    //     catch(Throwable $e){
-    //         return $e->getMessage();
-    //     }
-    // }
+        //     $client->messages->create('+916371668018',[
+        //         'from'=>$number,
+        //         'body'=>'hi'
+        //     ]);
+        //     return 'message sent';
+        // }
+        // catch(Throwable $e){
+        //     return $e->getMessage();
+        // }
+     
+        $body  =   ImageUploadModel::whereIn('id', $request->pic_id)->get();
+        echo(storage_path() . '/app/public/'.$body[0]['img_path']);
+        $sid    = env("TWILIO_SID");
+        $token  = env("TWILIO_AUTH_TOKEN");
+        $wa_from= env("TWILIO_WHATSAPP_NUMBER");
+        $twilio = new Client($sid, $token);
+        
+        //$body = "Hello, welcome to codelapan.com.";
+        return $twilio->messages->create("whatsapp:+916371668018",["from" => "whatsapp:$wa_from", "mediaUrl" => storage_path() . '/app/public/'.$body[0]['img_path']]);
+    }
     // public function send($notifiable, Notification $notification)
     // {
     //     $message = $notification->toWhatsApp($notifiable);

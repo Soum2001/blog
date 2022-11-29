@@ -17,7 +17,7 @@ class User extends Authenticatable
      *
      * @var array<int, string>
      */
-    public $table='users';   
+    public $table = 'users';
 
 
 
@@ -51,5 +51,11 @@ class User extends Authenticatable
     public function routeNotificationForSlack($notification)
     {
         return  env('SLACK_NOTIFICATION_WEBHOOK');
+    }
+
+
+    public function routeNotificationForWhatsApp()
+    {
+        return $this->phone_number;
     }
 }

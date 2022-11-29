@@ -111,7 +111,7 @@ Route::post('verify_otp',[RegistrationController::class,'verifyOtp']);
 Route::post('change_password',[RegistrationController::class,'changePassword']);
 
 Route::post('abc',[RegistrationController::class,'getNewPassword']);
-Route::get('/admin_page',[RegistrationController::class,'loadAdminPage']);
+Route::get('/admin_page',[RegistrationController::class,'loadAdminDashboard']);
 //AdminController
 Route::get('user_details',[AdminController::class,'loadUserDetails']);
 Route::post('edit_user',[AdminController::class,'editUserDetails']);
@@ -164,3 +164,6 @@ Route::post('/message', function(Request $request) {
  
     return view('thanks');
 });
+Auth::routes();
+
+Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
